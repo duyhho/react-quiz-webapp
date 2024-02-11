@@ -1,22 +1,22 @@
-import styled from 'styled-components'
-
+import styled from 'styled-components';
 
 export const Button = styled.button`
-    border: 1px solid #616A94;
+    /* Using CSS variables for colors */
+    border: 1px solid var(--color-deep-purple); /* Dark orange border */
     border-radius: 50px;
     padding: 15px 30px;
     text-decoration: none;
-    color: #616A94;
-    background-color: #161A31;
+    color: white; /* White text */
+    background-color: var(--color-deep-orange); /* Dark orange background */
     transition: 0.3s;
     font-size: 1em;
     cursor: pointer;
     outline: none;
 
     &:hover {
-        color: white;
-        background-color: #616A94;
+        color: white; /* Switch to a contrast color or keep it white as per preference */
+        background-color: var(--color-bright-orange); /* Lighter color for the hover state */
     }
 `;
 
-export default Button
+export default Button;

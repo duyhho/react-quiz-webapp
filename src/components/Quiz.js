@@ -22,12 +22,12 @@ const Options = styled.div`
 
 const Option = styled.button`
     display: block;
-    border: 1px solid #616A94;
-    border-radius: 15px;
+    border: 1px solid var(--color-dark-purple);
+    border-radius: 30px;
     padding: 15px 30px;
     text-decoration: none;
-    color: #616A94;
-    background-color: #161A31;
+    color: '#616A94';
+    background-color: white;
     transition: 0.3s;
     font-size: 1em;
     outline: none;
@@ -38,7 +38,7 @@ const Option = styled.button`
     @media screen and (min-width: 1180px) {
         &:hover {
             color: white;
-            background-color: #616A94;
+            background-color: var(--color-soft-coral);
         }
     }
 `;
@@ -46,6 +46,7 @@ const Option = styled.button`
 const Question = styled.div`
     width: 70%;
     margin: 0 auto;
+    color: var(--color-dark-purple)
 `;
 
 const Quiz = () => {
@@ -85,11 +86,10 @@ const Quiz = () => {
 
     return (
         <QuizWindow>
-            { quiz[number] &&
+            {quiz[number] &&
 
                 <>
-                    <Question dangerouslySetInnerHTML={{ __html: quiz[number].question }}></Question>
-
+                    <h3 className='question-text'>{quiz[number].question}</h3>
                     <Options>
                         {quiz[number].options.map((item, index) => (
                             <Option key={index} dangerouslySetInnerHTML={{ __html: item }} onClick={pickAnswer}></Option>

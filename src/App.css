@@ -1,18 +1,36 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:root {
+  --color-dark-purple: #201625;
+  --color-bright-orange: #f35e30;
+  --color-light-pink: #e9c7d7;
+  --color-soft-coral: #ee9880;
+  --color-coral: #fb8057;
+  --color-warm-orange: #fb8d61;
+  --color-brown: #9e512a;
+  --color-deep-orange: #a93218;
+  --color-pale-gold: #f2c688;
 }
 
-body, html {
-  background-color: #101427;
-  color: #e2e2e2;
+body,
+html {
+  background-color: var(--color-warm-orange);
+  color: var(--color-light-pink);
   overflow-x: hidden;
-
   font-family: 'Montserrat', sans-serif;
   font-size: 24px;
 }
 
-h1, h4 {
+/* Example of using other colors */
+h1 {
+  color: var(--color-dark-purple);
+  margin: .5em;
+}
+
+h4 {
+  color: white;
+  margin: .5em;
+}
+
+.question-text {
+  color: var(--color-dark-purple);
   margin: .5em;
 }

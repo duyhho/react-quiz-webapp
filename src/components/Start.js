@@ -12,15 +12,17 @@ const btnCSS = css`
 `;
 
 
-const Start = ({props}) => {
+const Start = ({ props }) => {
 
     const startQuiz = () => props(true)
- 
+
     return (
         <Intro>
-            <h1>Take the quiz.</h1>
-            <h4>Whenever, you want.</h4>
-            <Button onClick={startQuiz} css={btnCSS}>Begin</Button>
+            <h1>take the quiz.</h1>
+            <h4>whenever you want.</h4>
+            <Button onClick={startQuiz} css={btnCSS}>
+                begin
+            </Button>
         </Intro>
     )
 }
