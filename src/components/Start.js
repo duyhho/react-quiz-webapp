@@ -7,24 +7,24 @@ const Intro = styled.div`
   text-align: center;
 `;
 
-const btnCSS = css`
-    margin-top: 2em;
-`;
-
-
 const Start = ({ props }) => {
 
     const startQuiz = () => props(true)
 
+
     return (
-        <Intro>
+        // Use Bootstrap's flex utilities for vertical centering
+        <div className="d-flex flex-column justify-content-center align-items-center vh-100"
+            style={{ paddingBottom: 100, backgroundColor: 'var(--color-warm-orange)' }}>
             <h1>take the quiz.</h1>
             <h4>whenever you want.</h4>
-            <Button onClick={startQuiz} css={btnCSS}>
-                begin
-            </Button>
-        </Intro>
-    )
+            <div className="mt-1">
+                <Button onClick={startQuiz}>
+                    <b>begin</b>
+                </Button>
+            </div>
+        </div>
+    );
 }
 
 export default Start

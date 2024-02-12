@@ -1,27 +1,100 @@
-import styled from 'styled-components'
-import {Button} from './Button'
-
+import React from 'react';
+import styled from 'styled-components';
+import { Button } from './Button'; // Ensure this is the correct import for your Button
+import { faker } from '@faker-js/faker';
 const Title = styled.h1`
-    margin-top: 4em;
     font-size: 48px;
 `;
 
 const Points = styled.p`
     font-size: 24px;
-    margin-bottom: 3em;
 `;
+const evaluationTextMapping = {
+    I: {
+        I: `You and [Compatibility Name] see "I" to "I" when it comes to being a team of sorts. This is the type of connection that makes time feel to relative: no matter how long it's been since you last saw each other, it's like no time passed. Events in your lives sometimes organically overlap, or sometimes you need to reserve a spot in your calendar's empty slot to make sure you can connect. No need to force anything. The two of you meet up whenever is clever, you each have your own worlds that you prefer to keep separate, the only challenge may be to sometimes sacrifice a little me time for more we time.
 
-const GameOver = ({pts}) => {
+        AS FRIENDS:
+        It may be the case that [Compatibility Name] is your grounding force outside of your romantic relationships. You and [Compatibility Name] won’t have trouble respecting each other’s need for time alone time, making the times you do meet up more appreciated and cherished, and not to be taken for granted. Keep in mind that the beauty of independent worlds can also be their flaw. If you leave it all to chance you two might drift apart. If you don’t want the friendship to slip away, you’ll need some intentionality. Making the effort to reach out of your private bubbles to connect will ensure the bond stays strong and treasured. 
+        
+        AS PARTNERS:
+        There's nothing sexier than a little magnetic mystery, and that’s what you can get in a partnership where “I” meets “I”. It makes the shared moment a sacred rendezvous, a treasured glimpse into each other’s secret magical realms. Just be careful not to isolate too much. In order to build a deep connection with [Compatibility Name], you can’t live in 2 separate worlds. You'll need to also make time for each other, building a bond takes some effort. Sacrificing some privacy for quality time with your partner will provide a key ingredient to a thriving partnership.`,
+        We: `Sometimes your need to protect your peace might be at odds with [Compatibility Name]'s need for your time and attention—whether they're a friend, partner, or colleague. where you see boundaries and intrusion, they see opportunities for inclusion, eager to mesh everyone into everything. getting the dynamic you want with [Compatibility Name] means communicating openly, recognizing when you can be flexible, and when to maintain your space.
 
+        AS FRIENDS:
+        Forging a friendship with [Compatibility Name] might be a constant dance between blending and separating. You prefer things to be siloed (family, friendships, partners, etc), and you value your alone time, your own little universe. [Compatibility Name], though? They’re all about gathering the troops by roping everyone together, merging worlds at every chance. This contrast could have two effects on you: you may value their ability to pull you out of your universe; or someimes, you might be overwhelmed by their need to always be making plans. Or maybe a bit of both depending on your mood. Let them know how you're feeling. Showing up for [Compatibility Name] while also subtly establishing your limits can speak volumes in maintaining a balanced friendship.
+        
+        AS PARTNERS:
+        The journey with [Compatibility Name] depends on where you both land on the “I” and “we” scales. Knowing yourself is crucial and compromise is key. You’ll have to gauge your willingness to intertwine your worlds and be mindful of how much [Compatibility Name] can adapt to your preference for separation and "you time". It’s not about clinging—“we” individuals just value shared moments more. Ongoing self-reflection to discern where your lines are drawn and where there’s room to bend a little will go a long way.`
+    },
+    We: {
+        I: `Sometimes your openness might make it hard for you to understand [Compatibility Name]'s need for space. You might be wondering, “If i’m always down to have them around, why are they so picky and choosy with me?” It’s not about keeping score and you shouldn’t take it personally. It’s about understanding each other’s comfort zones. Just because you feel at ease bringing them along in your social circles, doesn’t mean they’ll feel the same. That said, you should advocate for your needs, and reflect on how much “we” time you need with [Compatibility Name] either as a friend or a partner. 
+
+        AS FRIENDS:
+        Yep, you've got it right, your friend [Compatibility Name] is a little on the private side. Even when you have the same interests, sometimes they'll wanna just do their own thing. And that does not have to be a bad thing. Respect their distance and focus on the quality time you do share. That'll matter more when building a friendship with [Compatibility Name] than how many different social circles and hobbies you share.
+        
+        AS PARTNERS:
+        Ok, so, obviously spending time with your partner is vital in a relationship. But being with with someone like [Compatibility Name], it means respecting their need for solitude while expressing your need for togetherness. Now there are extremes, so learn to know when either of you is pushing too far. There's this thing called compromise, and you're going to have a valuable opportunity to work on it in this relatinship. Nothing a good talk can't solve. Advocate for your needs, and hopefully, you and [Compatibility Name] will have a compatible kind of flexibility, a sweet spot where the two of you can find each other between their 'I-ness' and your 'We-ness'. `,
+        We: `You and [Compatibility Name] are totally down with a cozy mishmash of groups, whether its family, friends, partners or maybe just the two of you squeezing in as much time together as you can. You know the motto, "The more the merrier", life is one big party everyone is invited to. Just keep an eye out for overdoing the togetherness. There is also value in working a little 'you time' into your busy social calendars. Finding the healthy balance between joinging forces and sometimes rolling solo will keep things fresh and fun.
+
+       AS FRIENDS:
+       Friendship with [Compatibility Name] could look like a never-ending exchange of invites. Their friends. Your friends. It’s one big open club sharing love. Just remember, there’s beauty in boundaries too. Enjoy the continual mixing of worlds, but without some unspoken obligation. You might not always be up for every invite, and that’s totally ok. Embrace the shared experiences but maintain the freedom to opt-out when it suits you. It's not personal!
+       
+       AS PARTNERS:
+       With [Compatibility Name], it's quality time whenever is clever. An open buffet of shared experiences. You two will love practicing the art of merging worlds. Your time spent together is just as important as the time you spend in each other's worlds. Just be careful not to smother each other. A little separation is healthy. A solo adventure or a hangout with your bestie without your significant other can be refreshing. And it goes both ways. Mutual understanding and respecting the need for the occasional breather will add extra spice to your shared journey. `,
+    }
+};
+
+const GameOver = ({ selections }) => {
     const refreshPage = () => window.location.reload();
+    const randomFirstName = faker.name.firstName(); // Generate a random first name
+
+    // Retrieve and process the evaluation text
+    let evaluationText = evaluationTextMapping[selections.selfType][selections.matchType];
+    evaluationText = evaluationText.replace(/\[Compatibility Name\]/g, randomFirstName);
+
+    // Split the text into its respective parts
+    const splitText = splitEvaluationText(evaluationText);
 
     return (
-        <>
-            <Title>Game Over</Title>
-            <Points>You did {pts} out of 5!</Points>
-            <Button onClick={refreshPage}>Retry</Button>
-        </>
-    )
+        <div className="d-flex flex-column justify-content-center align-items-center vh-100"
+            style={{ padding: 100, backgroundColor: 'var(--color-warm-orange)' }}>
+            <Title>Evaluation Results</Title>
+            <Points>You identify as an "{selections.selfType}" person.</Points>
+            <Points>You are looking for a "{selections.matchType}" person.</Points>
+            {/* Optionally render the intro content if it exists */}
+            {splitText.intro && <Points>{splitText.intro}</Points>}
+            <Points><b>AS FRIENDS:</b> {splitText["AS FRIENDS:"]}</Points>
+            <Points><b>AS PARTNERS:</b> {splitText["AS PARTNERS:"]}</Points>
+            <Button onClick={refreshPage}><b>Retry</b></Button>
+        </div>
+    );
+};
+
+
+function splitEvaluationText(evaluationText) {
+    // Initialize an object to hold the split content, including an "intro" part
+    const splitContent = {
+        intro: "",
+        "AS FRIENDS:": "",
+        "AS PARTNERS:": ""
+    };
+
+    // Find indices for "AS FRIENDS:" and "AS PARTNERS:"
+    const friendsIndex = evaluationText.indexOf("AS FRIENDS:");
+    const partnersIndex = evaluationText.indexOf("AS PARTNERS:");
+
+    // Extract the intro text, if any, before "AS FRIENDS:"
+    splitContent.intro = friendsIndex !== -1 ? evaluationText.substring(0, friendsIndex).trim() : "";
+
+    // Extract content for "AS FRIENDS:" and "AS PARTNERS:", considering the found indices
+    if (friendsIndex !== -1 && partnersIndex !== -1) {
+        splitContent["AS FRIENDS:"] = evaluationText.substring(friendsIndex + "AS FRIENDS:".length, partnersIndex).trim();
+        splitContent["AS PARTNERS:"] = evaluationText.substring(partnersIndex + "AS PARTNERS:".length).trim();
+    }
+
+    return splitContent;
 }
 
-export default GameOver
+
+
+export default GameOver;

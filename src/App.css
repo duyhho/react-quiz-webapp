@@ -7,6 +7,7 @@
   --color-warm-orange: #fb8d61;
   --color-brown: #9e512a;
   --color-deep-orange: #a93218;
+  --color-dark-orange: #d3411c;
   --color-pale-gold: #f2c688;
 }
 
@@ -17,20 +18,20 @@ html {
   overflow-x: hidden;
   font-family: 'Montserrat', sans-serif;
   font-size: 24px;
+  height: 100%;
 }
 
 /* Example of using other colors */
 h1 {
-  color: var(--color-dark-purple);
+  color: var(--color-dark-purple) !important;
   margin: .5em;
 }
 
 h4 {
-  color: white;
+  color: white !important;
   margin: .5em;
 }
 
 .question-text {
   color: var(--color-dark-purple);
-  margin: .5em;
 }

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import './App.css'
 import Start from './components/Start'
 import Quiz from './components/Quiz'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
 
@@ -9,7 +10,7 @@ function App() {
 
   return (
     <div className="quiz">
-      { start ? <Quiz /> : <Start props={setStart} />} 
+      {start ? <Quiz /> : <Start props={setStart} />}
     </div>
   );
 }

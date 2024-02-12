@@ -7,7 +7,7 @@ export const Button = styled.button`
     padding: 15px 30px;
     text-decoration: none;
     color: white; /* White text */
-    background-color: var(--color-deep-orange); /* Dark orange background */
+    background-color: var(--color-dark-orange); /* Dark orange background */
     transition: 0.3s;
     font-size: 1em;
     cursor: pointer;

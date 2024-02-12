@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import axios from 'axios'
 import GameOver from './GameOver';
-
+import Button from './Button';
 const QuizWindow = styled.div`
     text-align: center;
     font-size: clamp(20px, 2.5vw, 24px);
-    margin-top: 10vh;
+    background-color: var(--color-warm-orange);
+    height: 98vh;
+    padding:2em;
 `;
 
 const Options = styled.div`
@@ -43,66 +45,59 @@ const Option = styled.button`
     }
 `;
 
-const Question = styled.div`
-    width: 70%;
-    margin: 0 auto;
-    color: var(--color-dark-purple)
-`;
+const quizQuestions = [
+    {
+        id: 1,
+        question: "Which behavior or mindset best represents you?",
+        options: [
+            { text: "I prefer making decisions based on my own opinions and benefits.", type: "I" },
+            { text: "I value group consensus and making decisions that benefit everyone.", type: "We" }
+        ]
+    },
+    {
+        id: 2,
+        question: "Which behavior or mindset best represents the person you'd like to match with?",
+        options: [
+            { text: "Someone who is independent and prioritizes their own goals.", type: "I" },
+            { text: "Someone who values collaboration and prioritizes the group's well-being.", type: "We" }
+        ]
+    }
+];
+
 
 const Quiz = () => {
-
-    const [quiz, setQuiz] = useState([]);
+    const initialSelections = { selfType: '', matchType: '' };
+    const [selections, setSelections] = useState(initialSelections);
     const [number, setNumber] = useState(0);
-    const [pts, setPts] = useState(0);
 
-    const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
-
-    const pickAnswer = (e) => {
-
-        let userAnswer = e.target.outerText;
-
-        if (quiz[number].answer === userAnswer) setPts(pts + 1);
+    const pickAnswer = (type) => {
+        const newSelections = { ...selections };
+        if (number === 0) {
+            newSelections.selfType = type;
+        } else if (number === 1) {
+            newSelections.matchType = type;
+        }
+        setSelections(newSelections);
         setNumber(number + 1);
-    }
-
-    useEffect(() => {
-
-        axios.get('https://opentdb.com/api.php?amount=5&category=18&difficulty=easy&type=multiple')
-            .then(res => {
-                setQuiz(res.data.results.map(item => (
-
-                    {
-                        question: item.question,
-                        options: shuffle([...item.incorrect_answers, item.correct_answer]),
-                        answer: item.correct_answer
-                    }
-
-                )));
-            })
-            .catch(err => console.error(err))
-
-    }, []);
-
+    };
 
     return (
-        <QuizWindow>
-            {quiz[number] &&
+        number < quizQuestions.length ? (
+            <QuizWindow>
+                <h3>{quizQuestions[number].question}</h3>
+                <Options>
+                    {quizQuestions[number].options.map((option, index) => (
+                        <Option key={index} onClick={() => pickAnswer(option.type)}>
+                            {option.text}
+                        </Option>
+                    ))}
+                </Options>
+            </QuizWindow>
+        ) : (
+            <GameOver selections={selections} />
+        )
+    );
 
-                <>
-                    <h3 className='question-text'>{quiz[number].question}</h3>
-                    <Options>
-                        {quiz[number].options.map((item, index) => (
-                            <Option key={index} dangerouslySetInnerHTML={{ __html: item }} onClick={pickAnswer}></Option>
-                        ))}
-                    </Options>
-                </>
-
-            }
-            {
-                number === 5 && <GameOver pts={pts} />
-            }
-        </QuizWindow>
-    )
-}
+};
 
 export default Quiz
