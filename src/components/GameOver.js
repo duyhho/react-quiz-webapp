@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Button } from './Button'; // Ensure this is the correct import for your Button
 import { faker } from '@faker-js/faker';
+import { Container } from 'react-bootstrap';
 const Title = styled.h1`
     font-size: 48px;
 `;
@@ -45,56 +46,87 @@ const evaluationTextMapping = {
 };
 
 const GameOver = ({ selections }) => {
+    const [evaluationText, setEvaluationText] = useState('');
+    const [splitText, setSplitText] = useState(null);
+
     const refreshPage = () => window.location.reload();
-    const randomFirstName = faker.name.firstName(); // Generate a random first name
+    const randomFirstName = faker.person.firstName(); // Generate a random first name
 
     // Retrieve and process the evaluation text
-    let evaluationText = evaluationTextMapping[selections.selfType][selections.matchType];
-    evaluationText = evaluationText.replace(/\[Compatibility Name\]/g, randomFirstName);
+    // let evaluationText = evaluationTextMapping[selections.selfType][selections.matchType];
+    // evaluationText = evaluationText.replace(/\[Compatibility Name\]/g, randomFirstName);
 
     // Split the text into its respective parts
-    const splitText = splitEvaluationText(evaluationText);
+    // const splitText = splitEvaluationText(evaluationText);
+    useEffect(() => {
+        const fetchEvaluationText = async () => {
+            const userType = selections.selfType;
+            const matchType = selections.matchType;
+            const url = `${process.env.REACT_APP_API_URL}?userType=${userType}&matchType=${matchType}`;
+            console.log('Fetching evaluation text...', url);
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Fetch failed');
+                const data = await response.json();
+
+                // Assume `data.answer` contains the full evaluation text to be split
+                const newText = data.answer.replace(/\[Compatibility Name\]/g, faker.person.firstName());
+                setSplitText(splitEvaluationText(newText));
+
+                console.log('splitText', newText)
+
+            } catch (error) {
+                console.error('Falling back to local evaluationTextMapping due to:', error);
+                const fallbackText = evaluationTextMapping[userType][matchType].replace(/\[Compatibility Name\]/g, faker.person.firstName());
+                setSplitText(splitEvaluationText(fallbackText));
+            }
+        };
+
+        fetchEvaluationText();
+    }, [selections.selfType, selections.matchType]); // Re-run if selections change
 
     return (
-        <div className="d-flex flex-column justify-content-center align-items-center vh-100"
-            style={{ padding: 100, backgroundColor: 'var(--color-warm-orange)' }}>
+        splitText && <Container className="d-flex flex-column justify-content-center align-items-center"
+            style={{ paddingTop: 100, paddingBottom: 20 }}>
             <Title>Evaluation Results</Title>
-            <Points>You identify as an "{selections.selfType}" person.</Points>
-            <Points>You are looking for a "{selections.matchType}" person.</Points>
-            {/* Optionally render the intro content if it exists */}
+            {/* <Points>You identify as an "{selections.selfType}" person.</Points> */}
+            {/* <Points>You are looking for a "{selections.matchType}" person.</Points> */}
+            {splitText.description && <Points>{splitText.description}</Points>}
             {splitText.intro && <Points>{splitText.intro}</Points>}
             <Points><b>AS FRIENDS:</b> {splitText["AS FRIENDS:"]}</Points>
             <Points><b>AS PARTNERS:</b> {splitText["AS PARTNERS:"]}</Points>
             <Button onClick={refreshPage}><b>Retry</b></Button>
-        </div>
+        </Container>
     );
+
 };
 
 
+
 function splitEvaluationText(evaluationText) {
-    // Initialize an object to hold the split content, including an "intro" part
+    // Split the text into paragraphs based on two newline characters
+    const paragraphs = evaluationText.split('\n\n');
+
+    // Initialize an object to hold the split content
     const splitContent = {
+        description: "",
         intro: "",
         "AS FRIENDS:": "",
         "AS PARTNERS:": ""
     };
 
-    // Find indices for "AS FRIENDS:" and "AS PARTNERS:"
-    const friendsIndex = evaluationText.indexOf("AS FRIENDS:");
-    const partnersIndex = evaluationText.indexOf("AS PARTNERS:");
-
-    // Extract the intro text, if any, before "AS FRIENDS:"
-    splitContent.intro = friendsIndex !== -1 ? evaluationText.substring(0, friendsIndex).trim() : "";
-
-    // Extract content for "AS FRIENDS:" and "AS PARTNERS:", considering the found indices
-    if (friendsIndex !== -1 && partnersIndex !== -1) {
-        splitContent["AS FRIENDS:"] = evaluationText.substring(friendsIndex + "AS FRIENDS:".length, partnersIndex).trim();
-        splitContent["AS PARTNERS:"] = evaluationText.substring(partnersIndex + "AS PARTNERS:".length).trim();
+    // Assign each paragraph to the appropriate part of splitContent
+    // Ensuring that there are at least 4 paragraphs to match the expected structure
+    if (paragraphs.length >= 4) {
+        splitContent.description = paragraphs[0].trim();
+        splitContent.intro = paragraphs[1].trim();
+        splitContent["AS FRIENDS:"] = paragraphs[2].trim().startsWith("AS FRIENDS:") ? paragraphs[2].trim().substring("AS FRIENDS:".length).trim() : paragraphs[2].trim();
+        splitContent["AS PARTNERS:"] = paragraphs[3].trim().startsWith("AS PARTNERS:") ? paragraphs[3].trim().substring("AS PARTNERS:".length).trim() : paragraphs[3].trim();
     }
 
     return splitContent;
 }
-
 
 
 export default GameOver;

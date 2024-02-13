@@ -9,7 +9,7 @@ function App() {
   const [start, setStart] = useState(false);
 
   return (
-    <div className="quiz">
+    <div className="quiz" style={{ backgroundColor: "var(--color-warm-orange)" }}>
       {start ? <Quiz /> : <Start props={setStart} />}
     </div>
   );
