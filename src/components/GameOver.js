@@ -46,14 +46,14 @@ const GameOver = ({ selections }) => {
                 // const data = null; //test default
                 // Assume `data.answer` contains the full evaluation text to be split
 
-                const newText = data.answer.replace(/\[Compatibility Name\]/g, randomFirstName);
+                const newText = data.answer.replace(/\[Compatibility Name\]/g, `<span style="font-weight: bold;">${randomFirstName}</span>`);
                 setSplitText(splitEvaluationText(newText));
 
                 console.log('splitText', newText)
 
             } catch (error) {
                 console.error('Falling back to local evaluationTextMapping due to:', error);
-                const fallbackText = evaluationTextMapping[userType][matchType].replace(/\[Compatibility Name\]/g, faker.person.firstName());
+                const fallbackText = evaluationTextMapping[userType][matchType].replace(/\[Compatibility Name\]/g, `<span style="font-weight: bold;">${randomFirstName}</span>`);
                 console.log('fallbackText', fallbackText)
                 const newSplitText = splitEvaluationText(fallbackText)
                 console.log('newSplitText', newSplitText)
@@ -73,16 +73,15 @@ const GameOver = ({ selections }) => {
             <Title>Evaluation Results ({userType}-{matchType})</Title>
             {/* <Points>You identify as an "{selections.selfType}" person.</Points> */}
             {/* <Points>You are looking for a "{selections.matchType}" person.</Points> */}
-            {splitText.description && <Points>{splitText.description}</Points>}
-            {splitText.intro && <Points>{splitText.intro}</Points>}
-            <Points><b>AS FRIENDS:</b> {splitText["AS FRIENDS:"]}</Points>
-            <Points><b>AS PARTNERS:</b> {splitText["AS PARTNERS:"]}</Points>
+            <Points><span dangerouslySetInnerHTML={{ __html: splitText["description"] }} /></Points>
+            <Points><span dangerouslySetInnerHTML={{ __html: splitText["intro"] }} /></Points>
+            <Points><b>AS FRIENDS:</b> <span dangerouslySetInnerHTML={{ __html: splitText["AS FRIENDS:"] }} /></Points>
+            <Points><b>AS PARTNERS:</b> <span dangerouslySetInnerHTML={{ __html: splitText["AS PARTNERS:"] }} /></Points>
             <Button onClick={refreshPage}><b>Retry</b></Button>
         </Container>
     );
 
 };
-
 
 
 function splitEvaluationText(evaluationText) {
