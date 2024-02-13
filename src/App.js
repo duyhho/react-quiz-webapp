@@ -4,15 +4,20 @@ import Start from './components/Start'
 import Quiz from './components/Quiz'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function App() {
-
+export default function App() {
   const [start, setStart] = useState(false);
 
+  // Apply a style object to the div
+  const appStyle = {
+    backgroundColor: "var(--color-warm-orange)",
+    minHeight: "100vh", // Ensure minimum height is 100% of the viewport height
+    display: "flex",
+    flexDirection: "column",
+  };
+
   return (
-    <div className="quiz" style={{ backgroundColor: "var(--color-warm-orange)" }}>
+    <div className="quiz" style={appStyle}>
       {start ? <Quiz /> : <Start props={setStart} />}
     </div>
   );
 }
-
-export default App;
