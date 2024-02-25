@@ -61,27 +61,32 @@ const QuizWindow = styled.div`
 `;
 
 const SelectScreen = () => {
-    const initialSelections = { selfType: '', matchType: '' };
+    const initialSelections = { selfType: null, matchType: null };
     const [selections, setSelections] = useState(initialSelections);
+    const [submittedSelections, setSubmittedSelections] = useState(initialSelections);
+
+    const [showEvaluation, setShowEvaluation] = useState(false);
+
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleSelect = (event) => {
-        console.log(event)
-
+        setShowEvaluation(false);
         const { name, value } = event.target;
         setSelections({ ...selections, [name]: value });
+
     };
 
     const areSelectionsValid = () => selections.selfType && selections.matchType;
-    const [showEvaluation, setShowEvaluation] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
-    // Function to handle finalizing the selections
+
     const handleFinalizeSelections = () => {
         if (areSelectionsValid()) {
+            setSubmittedSelections(selections);
             setShowEvaluation(true);
         } else {
             setErrorMessage('Please select both user type and compatibility type');
         }
     };
+
     return (
         <QuizWindow>
             <h3>Select user type and compatibility type:</h3>
@@ -134,7 +139,7 @@ const SelectScreen = () => {
             {showEvaluation && (
                 <>
                     <hr />
-                    <EvaluationScreen selections={selections} />
+                    <EvaluationScreen selections={submittedSelections} showEvaluation />
                 </>
             )}
         </QuizWindow>

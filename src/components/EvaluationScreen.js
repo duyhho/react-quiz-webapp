@@ -23,7 +23,7 @@ const evaluationTextMapping = {
 };
 
 
-const EvaluationScreen = ({ selections }) => {
+const EvaluationScreen = ({ selections, showEvaluation }) => {
     const [splitText, setSplitText] = useState(null);
     const [humanSplitText, setHumanSplitText] = useState(null);
 
@@ -68,12 +68,16 @@ const EvaluationScreen = ({ selections }) => {
         }
     };
     useEffect(() => {
-        setSplitText(null); // Clear the previous split text
-        fetchEvaluationText(1);
-        const fallbackText = evaluationTextMapping[userType][matchType].replace(/\[Compatibility Name\]/g, `<span style="font-weight: bold;">${randomFirstName}</span>`);
-        const newSplitText = splitEvaluationText(fallbackText);
-        setHumanSplitText(newSplitText);
-    }, [selections.selfType, selections.matchType]);
+        if (showEvaluation && selections.selfType && selections.matchType) {
+            console.log('selections.selfType', selections.selfType, 'selections.matchType', selections.matchType, 'showEvaluation', showEvaluation)
+            setSplitText(null); // Clear the previous split text
+            fetchEvaluationText(1);
+            const fallbackText = evaluationTextMapping[userType][matchType].replace(/\[Compatibility Name\]/g, `<span style="font-weight: bold;">${randomFirstName}</span>`);
+            const newSplitText = splitEvaluationText(fallbackText);
+            setHumanSplitText(newSplitText);
+        };
+
+    }, [selections.selfType, selections.matchType, showEvaluation]);
 
     useEffect(() => {
         // Scroll to evaluation text when splitText is set and loading is false
