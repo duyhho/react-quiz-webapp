@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const Button = styled.button`
+export const CustomButton = styled.button`
     /* Using CSS variables for colors */
     border: 1px solid var(--color-deep-purple); /* Dark orange border */
     border-radius: 50px;
@@ -19,4 +19,4 @@ export const Button = styled.button`
     }
 `;
 
-export default Button;
+export default CustomButton;

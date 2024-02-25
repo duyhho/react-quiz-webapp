@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Button } from './Button'; // Ensure this is the correct import for your Button
+import { CustomButton } from './CustomButton'; // Ensure this is the correct import for your Button
 import { faker } from '@faker-js/faker';
-import { Container } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import { BallTriangle } from 'react-loading-icons';
 const Title = styled.h1`
     font-size: 48px;
 `;
 
 const Points = styled.p`
-    font-size: 24px;
+    font-size: 20px;
 `;
 const evaluationTextMapping = {
     I: {
@@ -23,8 +23,10 @@ const evaluationTextMapping = {
 };
 
 
-const GameOver = ({ selections }) => {
+const EvaluationScreen = ({ selections }) => {
     const [splitText, setSplitText] = useState(null);
+    const [humanSplitText, setHumanSplitText] = useState(null);
+
 
     const refreshPage = () => window.location.reload();
     const randomFirstName = faker.person.firstName(); // Generate a random first name
@@ -32,53 +34,88 @@ const GameOver = ({ selections }) => {
     const userType = selections.selfType;
     const matchType = selections.matchType;
     //Fetch firestore data to get the evaluation text from evaluation_text collection. Each has a I and We document and I and We field
+    const [loading, setLoading] = useState(false);
+    const maxRetries = 3; // Maximum number of retries
+    const evaluationRef = useRef(null);
+    const fetchEvaluationText = async (retryCount) => {
+        const url = `${process.env.REACT_APP_API_URL}?userType=${selections.selfType}&matchType=${selections.matchType}&retrieveFromFirestore=false`;
+        console.log('Fetching evaluation text...', url, 'retry: ', retryCount);
+
+        try {
+            setLoading(true);
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Fetch failed');
+            const data = await response.json();
+            const newText = data.answer.replace(/\[Compatibility Name\]/g, `<span style='font-weight: bold;'>${randomFirstName}</span>`);
+            console.log('splitText', newText);
+            // const newText = '[""as]'
+            setSplitText(splitEvaluationTextGemini(newText));
+            // Simulating a failed fetch
+            // throw new Error('Fetch failed');
+            setLoading(false);
+
+        } catch (error) {
+            console.error('Error fetching evaluation text:', error);
+            if (retryCount < maxRetries) {
+                // Retry after 2 seconds
+                setTimeout(() => {
+                    fetchEvaluationText(retryCount + 1);
+                }, 2000);
+            } else {
+                console.log('Max retries reached');
+                setLoading(false);
+            }
+        }
+    };
+    useEffect(() => {
+        setSplitText(null); // Clear the previous split text
+        fetchEvaluationText(1);
+        const fallbackText = evaluationTextMapping[userType][matchType].replace(/\[Compatibility Name\]/g, `<span style="font-weight: bold;">${randomFirstName}</span>`);
+        const newSplitText = splitEvaluationText(fallbackText);
+        setHumanSplitText(newSplitText);
+    }, [selections.selfType, selections.matchType]);
 
     useEffect(() => {
-        const fetchEvaluationText = async () => {
-
-            const url = `${process.env.REACT_APP_API_URL}?userType=${userType}&matchType=${matchType}`;
-            console.log('Fetching evaluation text...', url);
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Fetch failed');
-                const data = await response.json();
-                // const data = null; //test default
-                // Assume `data.answer` contains the full evaluation text to be split
-
-                const newText = data.answer.replace(/\[Compatibility Name\]/g, `<span style="font-weight: bold;">${randomFirstName}</span>`);
-                setSplitText(splitEvaluationText(newText));
-
-                console.log('splitText', newText)
-
-            } catch (error) {
-                console.error('Falling back to local evaluationTextMapping due to:', error);
-                const fallbackText = evaluationTextMapping[userType][matchType].replace(/\[Compatibility Name\]/g, `<span style="font-weight: bold;">${randomFirstName}</span>`);
-                console.log('fallbackText', fallbackText)
-                const newSplitText = splitEvaluationText(fallbackText)
-                console.log('newSplitText', newSplitText)
-                setSplitText(newSplitText);
-            }
-        };
-
-        fetchEvaluationText();
-    }, [selections.selfType, selections.matchType]); // Re-run if selections change
-    if (!splitText) return <Container className="vh-100 d-flex flex-column justify-content-center align-items-center">
-        <BallTriangle height="130" width="130" />
-    </Container>
-
+        // Scroll to evaluation text when splitText is set and loading is false
+        if (splitText && !loading && evaluationRef.current) {
+            evaluationRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [splitText, loading]);
     return (
-        <Container className="d-flex flex-column justify-content-center align-items-center"
-            style={{ paddingTop: 90, paddingBottom: 15, backgroundColor: "var(--color-warm-orange)" }}>
+        <div className="d-flex flex-column justify-content-center align-items-center">
             <Title>Evaluation Results ({userType}-{matchType})</Title>
-            {/* <Points>You identify as an "{selections.selfType}" person.</Points> */}
-            {/* <Points>You are looking for a "{selections.matchType}" person.</Points> */}
-            <Points><span dangerouslySetInnerHTML={{ __html: splitText["description"] }} /></Points>
-            <Points><span dangerouslySetInnerHTML={{ __html: splitText["intro"] }} /></Points>
-            <Points><b>AS FRIENDS:</b> <span dangerouslySetInnerHTML={{ __html: splitText["AS FRIENDS:"] }} /></Points>
-            <Points><b>AS PARTNERS:</b> <span dangerouslySetInnerHTML={{ __html: splitText["AS PARTNERS:"] }} /></Points>
-            <Button onClick={refreshPage}><b>Retry</b></Button>
-        </Container>
+            <Row className="w-100">
+                <Col xs={12} md={6} className="d-flex flex-column align-items-center">
+                    <h3>Human Version:</h3>
+                    {humanSplitText && <div style={{ textAlign: 'left', backgroundColor: 'white', borderRadius: '10px', padding: '20px', width: '100%' }}>
+                        <Points><span dangerouslySetInnerHTML={{ __html: humanSplitText["description"] }} /></Points>
+                        <Points><span dangerouslySetInnerHTML={{ __html: humanSplitText["intro"] }} /></Points>
+                        <Points><b>AS FRIENDS:</b> <span dangerouslySetInnerHTML={{ __html: humanSplitText["AS FRIENDS:"] }} /></Points>
+                        <Points><b>AS PARTNERS:</b> <span dangerouslySetInnerHTML={{ __html: humanSplitText["AS PARTNERS:"] }} /></Points>
+                    </div>}
+                </Col>
+                <Col xs={12} md={6} className="d-flex flex-column align-items-center">
+                    <h3 ref={evaluationRef}>AI Version:</h3>
+                    {splitText && loading === false ? <div style={{ textAlign: 'left', backgroundColor: 'var(--color-light-blue)', borderRadius: '10px', padding: '20px', width: '100%' }}>
+                        <Points><span dangerouslySetInnerHTML={{ __html: splitText["description"] }} /></Points>
+                        <Points><span dangerouslySetInnerHTML={{ __html: splitText["intro"] }} /></Points>
+                        <Points><b>AS FRIENDS:</b> <span dangerouslySetInnerHTML={{ __html: splitText["AS FRIENDS:"] }} /></Points>
+                        <Points><b>AS PARTNERS:</b> <span dangerouslySetInnerHTML={{ __html: splitText["AS PARTNERS:"] }} /></Points>
+                        <div style={{ textAlign: 'center' }}>
+                            <Button style={{ backgroundColor: 'white' }} variant='outline-primary' className='mt-2' onClick={() => { fetchEvaluationText(0) }}><b>Generate Another</b></Button>
+                        </div>
+
+                    </div> : <div style={{ backgroundColor: 'var(--color-light-blue2)', borderRadius: '10px', padding: '20px', width: '100%' }}
+                        className='d-flex flex-column justify-content-center align-items-center'>
+                        <BallTriangle height="130" width="130" />
+                        <h4>Evaluation text is being generated by AI ...</h4>
+                    </div>}
+
+                </Col>
+            </Row>
+        </div>
+
+
     );
 
 };
@@ -92,10 +129,10 @@ function splitEvaluationText(evaluationText) {
 
     // Initialize an object to hold the split content
     const splitContent = {
-        description: "",
-        intro: "",
-        "AS FRIENDS:": "",
-        "AS PARTNERS:": ""
+        description: "AI Error",
+        intro: "AI Error",
+        "AS FRIENDS:": "AI Error",
+        "AS PARTNERS:": "AI Error"
     };
 
     // Assign each paragraph to the appropriate part of splitContent
@@ -110,5 +147,47 @@ function splitEvaluationText(evaluationText) {
     return splitContent;
 }
 
+function splitEvaluationTextGemini(evaluationText) {
+    // Properly escape double quotes inside the array elements
+    console.log('evaluationText before', evaluationText);
 
-export default GameOver;
+    // evaluationText = evaluationText.replace(/"([^"]*?)"/g, (_, match) => `"${match.replace(/"/g, '\\"')}"`);
+    console.log('evaluationText after', evaluationText);
+
+    // Convert the JSON string into a list
+    let paragraphs;
+    try {
+        paragraphs = JSON.parse(evaluationText);
+    } catch (error) {
+        console.error('Error parsing evaluationText:', error);
+        return {
+            description: "",
+            intro: "",
+            "AS FRIENDS:": "",
+            "AS PARTNERS:": ""
+        };
+    }
+
+    // Initialize an object to hold the split content
+    const splitContent = {
+        description: "",
+        intro: "",
+        "AS FRIENDS:": "",
+        "AS PARTNERS:": ""
+    };
+
+    // Assign each paragraph to the appropriate part of splitContent
+    // Ensuring that there are at least 4 paragraphs to match the expected structure
+    if (paragraphs.length >= 4) {
+        splitContent.description = paragraphs[0].trim().replace(" --EOP--", "");
+        splitContent.intro = paragraphs[1].trim().replace(" --EOP--", "");
+        splitContent["AS FRIENDS:"] = paragraphs[2].trim().replace(" --EOP--", "");
+        splitContent["AS PARTNERS:"] = paragraphs[3].trim().replace(" --EOP--", "");
+    }
+
+    return splitContent;
+}
+
+
+
+export default EvaluationScreen;

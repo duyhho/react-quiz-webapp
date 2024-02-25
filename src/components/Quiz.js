@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import axios from 'axios'
-import GameOver from './GameOver';
-import Button from './Button';
+// import GameOver from './GameOver';
+import Button from './CustomButton';
 const QuizWindow = styled.div`
     text-align: center;
     font-size: clamp(20px, 2.5vw, 24px);
@@ -94,7 +94,8 @@ const Quiz = () => {
                 </Options>
             </QuizWindow>
         ) : (
-            <GameOver selections={selections} />
+            // <GameOver selections={selections} />
+            <></>
         )
     );
 
