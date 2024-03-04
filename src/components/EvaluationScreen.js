@@ -41,6 +41,8 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
 
     const maxRetries = 3; // Maximum number of retries
     const evaluationRef = useRef(null);
+    const geminiEvaluationRef = useRef(null);
+
     const fetchEvaluationText = async (src = 'openai', retryCount) => {
 
         let url = `${process.env.REACT_APP_API_URL_OPENAI}?userType=${selections.selfType}&matchType=${selections.matchType}&retrieveFromFirestore=true`;
@@ -118,6 +120,12 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
             evaluationRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [splitText, loading]);
+    useEffect(() => {
+        // Scroll to evaluation text when splitText is set and loading is false
+        if (geminiInsights && !loadingGemini && geminiEvaluationRef.current) {
+            evaluationRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [geminiInsights, loadingGemini]);
     return (
         <div className="d-flex flex-column justify-content-center align-items-center">
             <Title>Evaluation Results ({userType}-{matchType})</Title>
@@ -151,7 +159,7 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
 
                 </Col>
                 <Col xs={12} md={4} className="d-flex flex-column align-items-center">
-                    <h3 ref={evaluationRef}>AI Version (Google):</h3>
+                    <h3 ref={geminiEvaluationRef}>AI Version (Google):</h3>
                     {geminiInsights && loadingGemini === false ? <div style={{ textAlign: 'left', backgroundColor: 'var(--color-light-blue2)', borderRadius: '10px', padding: '20px', width: '100%' }}>
                         <Points><span dangerouslySetInnerHTML={{ __html: geminiInsights["description"] }} /></Points>
                         <Points><span dangerouslySetInnerHTML={{ __html: geminiInsights["intro"] }} /></Points>
