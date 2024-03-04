@@ -9,7 +9,7 @@ const Title = styled.h1`
 `;
 
 const Points = styled.p`
-    font-size: 20px;
+    font-size: 18px;
 `;
 const evaluationTextMapping = {
     I: {
@@ -21,49 +21,80 @@ const evaluationTextMapping = {
         We: `You want to create shared memories, be in the moment with your partner. Exploring your different worlds is how you become a part of each other’s lives. For you, quality time is top-tier important. It comes before everything else, otherwise you might feel like, what’s the point of a partnership, ya know?--EOP--You and [Compatibility Name] are totally down with a cozy mishmash of groups, whether its family, friends, partners or maybe just the two of you squeezing in as much time together as you can. You know the motto, "The more the merrier", life is one big party everyone is invited to. Just keep an eye out for overdoing the togetherness. There is also value in working a little 'you time' into your busy social calendars. Finding the healthy balance between joinging forces and sometimes rolling solo will keep things fresh and fun.--EOP--Friendship with [Compatibility Name] could look like a never-ending exchange of invites. Their friends. Your friends. It’s one big open club sharing love. Just remember, there’s beauty in boundaries too. Enjoy the continual mixing of worlds, but without some unspoken obligation. You might not always be up for every invite, and that’s totally ok. Embrace the shared experiences but maintain the freedom to opt-out when it suits you. It's not personal!--EOP--With [Compatibility Name], it's quality time whenever is clever. An open buffet of shared experiences. You two will love practicing the art of merging worlds. Your time spent together is just as important as the time you spend in each other's worlds. Just be careful not to smother each other. A little separation is healthy. A solo adventure or a hangout with your bestie without your significant other can be refreshing. And it goes both ways. Mutual understanding and respecting the need for the occasional breather will add extra spice to your shared journey. `,
     }
 };
+const randomFirstName = faker.person.firstName(); // Generate a random first name
 
 
 const EvaluationScreen = ({ selections, showEvaluation }) => {
     const [splitText, setSplitText] = useState(null);
+    const [geminiInsights, setGeminiInsights] = useState(null);
+
     const [humanSplitText, setHumanSplitText] = useState(null);
 
-
-    const refreshPage = () => window.location.reload();
     const randomFirstName = faker.person.firstName(); // Generate a random first name
+    const refreshPage = () => window.location.reload();
 
     const userType = selections.selfType;
     const matchType = selections.matchType;
     //Fetch firestore data to get the evaluation text from evaluation_text collection. Each has a I and We document and I and We field
     const [loading, setLoading] = useState(false);
+    const [loadingGemini, setLoadingGemini] = useState(false);
+
     const maxRetries = 3; // Maximum number of retries
     const evaluationRef = useRef(null);
-    const fetchEvaluationText = async (retryCount) => {
-        const url = `${process.env.REACT_APP_API_URL}?userType=${selections.selfType}&matchType=${selections.matchType}&retrieveFromFirestore=false`;
+    const fetchEvaluationText = async (src = 'openai', retryCount) => {
+
+        let url = `${process.env.REACT_APP_API_URL_OPENAI}?userType=${selections.selfType}&matchType=${selections.matchType}&retrieveFromFirestore=true`;
+        if (src === 'gemini') {
+            url = `${process.env.REACT_APP_API_URL_GEMINI}?userType=${selections.selfType}&matchType=${selections.matchType}&retrieveFromFirestore=false`;
+        }
+
         console.log('Fetching evaluation text...', url, 'retry: ', retryCount);
 
         try {
-            setLoading(true);
+            if (src === 'openai') {
+                setLoading(true);
+
+            }
+            else if (src === 'gemini') {
+                setLoadingGemini(true);
+            }
             const response = await fetch(url);
             if (!response.ok) throw new Error('Fetch failed');
             const data = await response.json();
-            const newText = data.answer.replace(/\[Compatibility Name\]/g, `<span style='font-weight: bold;'>${randomFirstName}</span>`);
-            console.log('splitText', newText);
+            const placeholderInsights = data.insights
+            const insights = []
+            placeholderInsights.forEach((insight) => {
+                insights.push(insight.replace(/\[Compatibility Name\]/g, `<span style='font-weight: bold;'>${randomFirstName}</span>`));
+            });
+            console.log('insights', insights);
             // const newText = '[""as]'
-            setSplitText(splitEvaluationTextGemini(newText));
+            if (src === 'openai') {
+                setSplitText(splitEvaluationTextGemini(insights));
+                setLoading(false);
+            }
+            else if (src === 'gemini') {
+                setGeminiInsights(splitEvaluationTextGemini(insights));
+                setLoadingGemini(false);
+            }
             // Simulating a failed fetch
             // throw new Error('Fetch failed');
-            setLoading(false);
+
 
         } catch (error) {
             console.error('Error fetching evaluation text:', error);
             if (retryCount < maxRetries) {
                 // Retry after 2 seconds
                 setTimeout(() => {
-                    fetchEvaluationText(retryCount + 1);
+                    fetchEvaluationText(src, retryCount + 1);
                 }, 2000);
             } else {
                 console.log('Max retries reached');
-                setLoading(false);
+                if (src === 'openai') {
+                    setLoading(false);
+                }
+                else if (src === 'gemini') {
+                    setLoadingGemini(false);
+                }
             }
         }
     };
@@ -71,7 +102,9 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
         if (showEvaluation && selections.selfType && selections.matchType) {
             console.log('selections.selfType', selections.selfType, 'selections.matchType', selections.matchType, 'showEvaluation', showEvaluation)
             setSplitText(null); // Clear the previous split text
-            fetchEvaluationText(1);
+            fetchEvaluationText('openai', 1);
+            fetchEvaluationText('gemini', 1);
+
             const fallbackText = evaluationTextMapping[userType][matchType].replace(/\[Compatibility Name\]/g, `<span style="font-weight: bold;">${randomFirstName}</span>`);
             const newSplitText = splitEvaluationText(fallbackText);
             setHumanSplitText(newSplitText);
@@ -89,8 +122,8 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
         <div className="d-flex flex-column justify-content-center align-items-center">
             <Title>Evaluation Results ({userType}-{matchType})</Title>
             <Row className="w-100">
-                <Col xs={12} md={6} className="d-flex flex-column align-items-center">
-                    <h3>Human Version:</h3>
+                <Col xs={12} md={4} className="d-flex flex-column align-items-center">
+                    <h3>Human Expert Version:</h3>
                     {humanSplitText && <div style={{ textAlign: 'left', backgroundColor: 'white', borderRadius: '10px', padding: '20px', width: '100%' }}>
                         <Points><span dangerouslySetInnerHTML={{ __html: humanSplitText["description"] }} /></Points>
                         <Points><span dangerouslySetInnerHTML={{ __html: humanSplitText["intro"] }} /></Points>
@@ -98,21 +131,41 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
                         <Points><b>AS PARTNERS:</b> <span dangerouslySetInnerHTML={{ __html: humanSplitText["AS PARTNERS:"] }} /></Points>
                     </div>}
                 </Col>
-                <Col xs={12} md={6} className="d-flex flex-column align-items-center">
-                    <h3 ref={evaluationRef}>AI Version:</h3>
-                    {splitText && loading === false ? <div style={{ textAlign: 'left', backgroundColor: 'var(--color-light-blue)', borderRadius: '10px', padding: '20px', width: '100%' }}>
+                <Col xs={12} md={4} className="d-flex flex-column align-items-center">
+                    <h3 ref={evaluationRef}>AI Version (OpenAI):</h3>
+                    {splitText && loading === false ? <div style={{ textAlign: 'left', backgroundColor: 'var(--color-light-green)', borderRadius: '10px', padding: '20px', width: '100%' }}>
                         <Points><span dangerouslySetInnerHTML={{ __html: splitText["description"] }} /></Points>
                         <Points><span dangerouslySetInnerHTML={{ __html: splitText["intro"] }} /></Points>
                         <Points><b>AS FRIENDS:</b> <span dangerouslySetInnerHTML={{ __html: splitText["AS FRIENDS:"] }} /></Points>
                         <Points><b>AS PARTNERS:</b> <span dangerouslySetInnerHTML={{ __html: splitText["AS PARTNERS:"] }} /></Points>
                         <div style={{ textAlign: 'center' }}>
-                            <Button style={{ backgroundColor: 'white' }} variant='outline-primary' className='mt-2' onClick={() => { fetchEvaluationText(0) }}><b>Generate Another</b></Button>
+                            <Button style={{ backgroundColor: 'white' }} variant='outline-primary' className='mt-2' onClick={() => { fetchEvaluationText('openai', 0) }}><b>Generate Another</b></Button>
+                        </div>
+
+                    </div> : <div style={{ backgroundColor: 'var(--color-light-green)', borderRadius: '10px', padding: '20px', width: '100%' }}
+                        className='d-flex flex-column justify-content-center align-items-center'>
+                        <BallTriangle height="130" width="130" />
+                        <br></br>
+                        <h4>Evaluation text is being generated by GPT-4 ...</h4>
+                    </div>}
+
+                </Col>
+                <Col xs={12} md={4} className="d-flex flex-column align-items-center">
+                    <h3 ref={evaluationRef}>AI Version (Google):</h3>
+                    {geminiInsights && loadingGemini === false ? <div style={{ textAlign: 'left', backgroundColor: 'var(--color-light-blue2)', borderRadius: '10px', padding: '20px', width: '100%' }}>
+                        <Points><span dangerouslySetInnerHTML={{ __html: geminiInsights["description"] }} /></Points>
+                        <Points><span dangerouslySetInnerHTML={{ __html: geminiInsights["intro"] }} /></Points>
+                        <Points><b>AS FRIENDS:</b> <span dangerouslySetInnerHTML={{ __html: geminiInsights["AS FRIENDS:"] }} /></Points>
+                        <Points><b>AS PARTNERS:</b> <span dangerouslySetInnerHTML={{ __html: geminiInsights["AS PARTNERS:"] }} /></Points>
+                        <div style={{ textAlign: 'center' }}>
+                            <Button style={{ backgroundColor: 'white' }} variant='outline-primary' className='mt-2' onClick={() => { fetchEvaluationText('gemini', 0) }}><b>Generate Another</b></Button>
                         </div>
 
                     </div> : <div style={{ backgroundColor: 'var(--color-light-blue2)', borderRadius: '10px', padding: '20px', width: '100%' }}
                         className='d-flex flex-column justify-content-center align-items-center'>
                         <BallTriangle height="130" width="130" />
-                        <h4>Evaluation text is being generated by AI ...</h4>
+                        <br></br>
+                        <h4>Evaluation text is being generated by Gemini ...</h4>
                     </div>}
 
                 </Col>
@@ -151,42 +204,26 @@ function splitEvaluationText(evaluationText) {
     return splitContent;
 }
 
-function splitEvaluationTextGemini(evaluationText) {
+function splitEvaluationTextGemini(evaluationList) {
     // Properly escape double quotes inside the array elements
-    console.log('evaluationText before', evaluationText);
-
+    console.log('evaluationList before', evaluationList);
     // evaluationText = evaluationText.replace(/"([^"]*?)"/g, (_, match) => `"${match.replace(/"/g, '\\"')}"`);
-    console.log('evaluationText after', evaluationText);
-
-    // Convert the JSON string into a list
-    let paragraphs;
-    try {
-        paragraphs = JSON.parse(evaluationText);
-    } catch (error) {
-        console.error('Error parsing evaluationText:', error);
-        return {
-            description: "",
-            intro: "",
-            "AS FRIENDS:": "",
-            "AS PARTNERS:": ""
-        };
-    }
-
+    console.log('evaluationList after', evaluationList);
     // Initialize an object to hold the split content
     const splitContent = {
-        description: "",
-        intro: "",
-        "AS FRIENDS:": "",
-        "AS PARTNERS:": ""
+        description: "AI Error. Please try again.",
+        intro: "AI Error. Please try again.",
+        "AS FRIENDS:": "AI Error. Please try again.",
+        "AS PARTNERS:": "AI Error. Please try again."
     };
 
     // Assign each paragraph to the appropriate part of splitContent
     // Ensuring that there are at least 4 paragraphs to match the expected structure
-    if (paragraphs.length >= 4) {
-        splitContent.description = paragraphs[0].trim().replace(" --EOP--", "");
-        splitContent.intro = paragraphs[1].trim().replace(" --EOP--", "");
-        splitContent["AS FRIENDS:"] = paragraphs[2].trim().replace(" --EOP--", "");
-        splitContent["AS PARTNERS:"] = paragraphs[3].trim().replace(" --EOP--", "");
+    if (evaluationList.length >= 4) {
+        splitContent.description = evaluationList[0].trim()
+        splitContent.intro = evaluationList[1].trim()
+        splitContent["AS FRIENDS:"] = evaluationList[2].trim()
+        splitContent["AS PARTNERS:"] = evaluationList[3].trim()
     }
 
     return splitContent;
