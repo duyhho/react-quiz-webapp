@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { CustomButton } from './CustomButton'; // Ensure this is the correct import for your Button
-import { faker } from '@faker-js/faker';
+import { faker, th } from '@faker-js/faker';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { BallTriangle } from 'react-loading-icons';
 const Title = styled.h1`
@@ -68,8 +68,11 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
             placeholderInsights.forEach((insight) => {
                 insights.push(insight.replace(/\[Compatibility Name\]/g, `<span style='font-weight: bold;'>${randomFirstName}</span>`));
             });
-            console.log('insights', insights);
+            console.log('insights', src, insights);
             // const newText = '[""as]'
+            if (insights.length < 4) {
+                throw new Error('Insights does not have correct length');
+            }
             if (src === 'openai') {
                 setSplitText(splitEvaluationTextGemini(insights));
                 setLoading(false);
@@ -87,6 +90,7 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
             if (retryCount < maxRetries) {
                 // Retry after 2 seconds
                 setTimeout(() => {
+                    console.log('Retrying...')
                     fetchEvaluationText(src, retryCount + 1);
                 }, 2000);
             } else {
