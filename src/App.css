@@ -38,3 +38,41 @@ h4 {
 .question-text {
   color: var(--color-dark-purple);
 }
+
+/* For Firefox */
+@-moz-document url-prefix() {
+  body {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-warm-orange) #f1f1f1;
+  }
+
+  body:hover {
+    scrollbar-color: var(--color-bright-orange) #f1f1f1;
+  }
+}
+
+/* Customizing the scrollbar for WebKit browsers */
+::-webkit-scrollbar {
+  width: 14px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-warm-orange);
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  /* color: var(--lightorange) #f1f1f1; */
+
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-bright-orange);
+  /* Change the background color on hover */
+  border: 1px solid transparent !important;
+  background-clip: padding-box;
+  /* Add a border with a different color on hover */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
