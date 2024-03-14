@@ -2,8 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { CustomButton } from './CustomButton'; // Ensure this is the correct import for your Button
 import { faker, th } from '@faker-js/faker';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Alert, Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { BallTriangle } from 'react-loading-icons';
+import { addDoc, collection } from 'firebase/firestore';
+import { Modal } from 'react-bootstrap';
+
+import { firestore } from './firebase';
 const Title = styled.h1`
     font-size: 48px;
 `;
@@ -42,6 +46,8 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
     const maxRetries = 3; // Maximum number of retries
     const evaluationRef = useRef(null);
     const geminiEvaluationRef = useRef(null);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [showAlert, setShowAlert] = useState(false);
 
     const fetchEvaluationText = async (src = 'openai', retryCount) => {
 
@@ -130,9 +136,85 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
             evaluationRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [geminiInsights, loadingGemini]);
+
+    const [openaiFeedback, setOpenaiFeedback] = useState('');
+    const [geminiFeedback, setGeminiFeedback] = useState('');
+    const [showModal, setShowModal] = useState(false);
+
+    const handleFeedbackSubmit = async (event) => {
+        event.preventDefault(); // Prevent the default form submission behavior
+
+        const feedbackType = event.target.id; // Get the feedback type (openai or gemini)
+
+        const feedbackText = feedbackType === "openai" ? openaiFeedback : geminiFeedback;
+        console.log('feedbackType', feedbackType)
+        if (!feedbackText.trim()) {
+            setAlertMessage("Please enter some feedback before submitting.");
+            setShowAlert(true);
+            return;
+        }
+
+        try {
+            // Determine the Firestore document based on the feedback type
+            const feedbackDoc = feedbackType === "openai" ? "feedback_openai" : "feedback_gemini";
+
+            // Add the feedback to the Firestore database
+            await addDoc(collection(firestore, feedbackDoc), {
+                feedback: feedbackText,
+                createdAt: new Date(),
+                userType: selections.selfType,
+                matchType: selections.matchType,
+                evaluationText: feedbackType === "openai" ? splitText : geminiInsights
+            });
+
+            // Clear the feedback form
+            feedbackType === "openai" ? setOpenaiFeedback('') : setGeminiFeedback('');
+
+            // Show a success message
+            const modelName = feedbackType === "openai" ? "OpenAI" : "Gemini";
+            setShowAlert(true);
+            setAlertMessage(`Thank you for your feedback to ${modelName}!`);
+
+        } catch (error) {
+            console.error("Error submitting feedback:", error);
+            setAlertMessage("An error occurred while submitting your feedback. Please try again later.");
+            setShowAlert(true);
+        }
+    };
+
+
     return (
         <div className="d-flex flex-column justify-content-center align-items-center">
             <Title>Evaluation Results ({userType}-{matchType})</Title>
+            {/* {showAlert && (
+                <Alert variant="success" onClose={() => setShowAlert(false)} dismissible>
+                    {alertMessage}
+                </Alert>
+            )} */}
+            <Modal show={showAlert} onHide={() => setShowAlert(false)} centered >
+                <Modal.Header closeButton style={{
+                    backgroundColor: alertMessage.toLowerCase().includes('error') ? '#dc3545' : 'var(--color-light-green)',
+                    color: 'white',
+                    fontSize: '16px'
+                }} >
+                </Modal.Header>
+                <Modal.Body style={{
+                    textAlign: 'center',
+                    backgroundColor: alertMessage.toLowerCase().includes('error') ? '#dc3545' : 'var(--color-light-green)',
+                    color: 'black',
+                    // fontSize: '18px'
+                }} >
+                    {alertMessage}
+                </Modal.Body>
+                <Modal.Footer style={{
+                    textAlign: 'center',
+                    backgroundColor: alertMessage.toLowerCase().includes('error') ? '#dc3545' : 'var(--color-light-green)',
+                    color: 'black',
+                    // fontSize: '18px'
+                }} />
+            </Modal>
+
+
             <Row className="w-100">
                 <Col xs={12} md={4} className="d-flex flex-column align-items-center">
                     <h3>Human Expert Version:</h3>
@@ -145,44 +227,103 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
                 </Col>
                 <Col xs={12} md={4} className="d-flex flex-column align-items-center">
                     <h3 ref={evaluationRef}>AI Version (OpenAI):</h3>
-                    {splitText && loading === false ? <div style={{ textAlign: 'left', backgroundColor: 'var(--color-light-green)', borderRadius: '10px', padding: '20px', width: '100%' }}>
-                        <Points><span dangerouslySetInnerHTML={{ __html: splitText["description"] }} /></Points>
-                        <Points><span dangerouslySetInnerHTML={{ __html: splitText["intro"] }} /></Points>
-                        <Points><b>AS FRIENDS:</b> <span dangerouslySetInnerHTML={{ __html: splitText["AS FRIENDS:"] }} /></Points>
-                        <Points><b>AS PARTNERS:</b> <span dangerouslySetInnerHTML={{ __html: splitText["AS PARTNERS:"] }} /></Points>
-                        <div style={{ textAlign: 'center' }}>
-                            <Button style={{ backgroundColor: 'white' }} variant='outline-primary' className='mt-2' onClick={() => { fetchEvaluationText('openai', 0) }}><b>Generate Another</b></Button>
+                    {splitText && loading === false ? (
+                        <div style={{ textAlign: 'left', backgroundColor: 'var(--color-light-green)', borderRadius: '10px', padding: '20px', width: '100%' }}>
+                            <Points><span dangerouslySetInnerHTML={{ __html: splitText["description"] }} /></Points>
+                            <Points><span dangerouslySetInnerHTML={{ __html: splitText["intro"] }} /></Points>
+                            <Points><b>AS FRIENDS:</b> <span dangerouslySetInnerHTML={{ __html: splitText["AS FRIENDS:"] }} /></Points>
+                            <Points><b>AS PARTNERS:</b> <span dangerouslySetInnerHTML={{ __html: splitText["AS PARTNERS:"] }} /></Points>
+                            <div style={{ textAlign: 'center' }}>
+                                <Button style={{
+                                    backgroundColor: 'white',
+                                    borderColor: 'var(--color-dark-green)',
+                                    color: 'var(--color-dark-green)'
+                                }} variant='outline-primary' className='mt-2' onClick={() => { fetchEvaluationText('openai', 0) }}><b>Generate Another</b></Button>
+                            </div>
+                            {/* Feedback Form */}
+                            <Form className="mt-3 text-center align-items-center" onSubmit={handleFeedbackSubmit} id='openai'>
+                                <Form.Group className="mb-3" controlId="openaiFeedback">
+                                    <Form.Label>Your Feedback:</Form.Label>
+                                    <Form.Control
+                                        as="textarea"
+                                        rows={3}
+                                        placeholder="Enter your feedback here for OpenAI..."
+                                        style={{ fontSize: '16px' }}
+                                        value={openaiFeedback}
+                                        onChange={(e) => setOpenaiFeedback(e.target.value)}
+                                    />
+
+                                </Form.Group>
+                                <Button
+                                    variant="primary"
+                                    type="submit"
+                                    style={{
+                                        backgroundColor: 'var(--color-dark-green)',
+                                        borderColor: 'var(--color-dark-green)',
+                                        // cursor: openaiFeedback.trim() ? 'pointer' : 'not-allowed'
+                                    }}
+                                    disabled={!openaiFeedback.trim()}
+                                >
+                                    Submit Feedback
+                                </Button>
+
+
+                            </Form>
                         </div>
-
-                    </div> : <div style={{ backgroundColor: 'var(--color-light-green)', borderRadius: '10px', padding: '20px', width: '100%' }}
-                        className='d-flex flex-column justify-content-center align-items-center'>
-                        <BallTriangle height="130" width="130" />
-                        <br></br>
-                        <h4>Evaluation text is being generated by GPT-4 ...</h4>
-                    </div>}
-
+                    ) : (
+                        <div style={{ backgroundColor: 'var(--color-light-green)', borderRadius: '10px', padding: '20px', width: '100%' }}
+                            className='d-flex flex-column justify-content-center align-items-center'>
+                            <BallTriangle height="130" width="130" />
+                            <br></br>
+                            <h4>Evaluation text is being generated by GPT-4 ...</h4>
+                        </div>
+                    )}
                 </Col>
                 <Col xs={12} md={4} className="d-flex flex-column align-items-center">
                     <h3 ref={geminiEvaluationRef}>AI Version (Google):</h3>
-                    {geminiInsights && loadingGemini === false ? <div style={{ textAlign: 'left', backgroundColor: 'var(--color-light-blue2)', borderRadius: '10px', padding: '20px', width: '100%' }}>
-                        <Points><span dangerouslySetInnerHTML={{ __html: geminiInsights["description"] }} /></Points>
-                        <Points><span dangerouslySetInnerHTML={{ __html: geminiInsights["intro"] }} /></Points>
-                        <Points><b>AS FRIENDS:</b> <span dangerouslySetInnerHTML={{ __html: geminiInsights["AS FRIENDS:"] }} /></Points>
-                        <Points><b>AS PARTNERS:</b> <span dangerouslySetInnerHTML={{ __html: geminiInsights["AS PARTNERS:"] }} /></Points>
-                        <div style={{ textAlign: 'center' }}>
-                            <Button style={{ backgroundColor: 'white' }} variant='outline-primary' className='mt-2' onClick={() => { fetchEvaluationText('gemini', 0) }}><b>Generate Another</b></Button>
+                    {geminiInsights && loadingGemini === false ? (
+                        <div style={{ textAlign: 'left', backgroundColor: 'var(--color-light-blue2)', borderRadius: '10px', padding: '20px', width: '100%' }}>
+                            <Points><span dangerouslySetInnerHTML={{ __html: geminiInsights["description"] }} /></Points>
+                            <Points><span dangerouslySetInnerHTML={{ __html: geminiInsights["intro"] }} /></Points>
+                            <Points><b>AS FRIENDS:</b> <span dangerouslySetInnerHTML={{ __html: geminiInsights["AS FRIENDS:"] }} /></Points>
+                            <Points><b>AS PARTNERS:</b> <span dangerouslySetInnerHTML={{ __html: geminiInsights["AS PARTNERS:"] }} /></Points>
+                            <div style={{ textAlign: 'center' }}>
+                                <Button style={{ backgroundColor: 'white' }} variant='outline-primary' className='mt-2' onClick={() => { fetchEvaluationText('gemini', 0) }}><b>Generate Another</b></Button>
+                            </div>
+                            {/* Feedback Form */}
+                            <Form className="mt-3 text-center" onSubmit={handleFeedbackSubmit} id='gemini'>
+                                <Form.Group className="mb-3" controlId="geminiFeedback">
+                                    <Form.Label>Your Feedback:</Form.Label>
+                                    <Form.Control
+                                        as="textarea"
+                                        rows={3}
+                                        placeholder="Enter your feedback here for Gemini..."
+                                        style={{ fontSize: '16px' }}
+                                        value={geminiFeedback}
+                                        onChange={(e) => setGeminiFeedback(e.target.value)}
+                                    />
+                                </Form.Group>
+                                <Button
+                                    variant="primary"
+                                    type="submit"
+                                    disabled={!geminiFeedback.trim()}
+                                >
+                                    Submit Feedback
+                                </Button>
+                            </Form>
                         </div>
-
-                    </div> : <div style={{ backgroundColor: 'var(--color-light-blue2)', borderRadius: '10px', padding: '20px', width: '100%' }}
-                        className='d-flex flex-column justify-content-center align-items-center'>
-                        <BallTriangle height="130" width="130" />
-                        <br></br>
-                        <h4>Evaluation text is being generated by Gemini ...</h4>
-                    </div>}
-
+                    ) : (
+                        <div style={{ backgroundColor: 'var(--color-light-blue2)', borderRadius: '10px', padding: '20px', width: '100%' }}
+                            className='d-flex flex-column justify-content-center align-items-center'>
+                            <BallTriangle height="130" width="130" />
+                            <br></br>
+                            <h4>Evaluation text is being generated by Gemini ...</h4>
+                        </div>
+                    )}
                 </Col>
+
             </Row>
-        </div>
+        </div >
 
 
     );
