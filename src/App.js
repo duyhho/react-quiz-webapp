@@ -1,28 +1,28 @@
-import React, { useState } from 'react'
-import './App.css'
-import Start from './components/Start'
-import Quiz from './components/Quiz'
-import SelectScreen from './components/SelectScreen'
+import React from 'react';
+import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
+import SelectScreen from './components/SelectScreen';
+import Examples from './components/Examples';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function App() {
-  const [start, setStart] = useState(false);
-
-  // Apply a style object to the div
   const appStyle = {
     backgroundColor: "var(--color-warm-orange)",
-    minHeight: "100vh", // Ensure minimum height is 100% of the viewport height
+    minHeight: "100vh",
     display: "flex",
     flexDirection: "column",
   };
 
   return (
-    <div className="quiz"
-      style={appStyle}
-    >
-      {/* {start ? <Quiz /> : <Start props={setStart} />} */}
-      <SelectScreen />
+
+    <div className="quiz" style={appStyle}>
+      <Routes>
+        <Route exact path="/" element={<SelectScreen />} />
+        <Route path="/examples" element={<Examples />} />
+        {/* Add more routes as needed */}
+      </Routes>
     </div>
+
   );
 }

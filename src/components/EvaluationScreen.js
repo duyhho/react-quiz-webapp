@@ -9,6 +9,7 @@ import { Modal } from 'react-bootstrap';
 import { evaluationTextMapping } from './defaultMapping';
 import { firestore } from './firebase';
 import Carousel from 'react-bootstrap/Carousel';
+import { categories } from './SelectScreen';
 const Title = styled.h1`
     font-size: 48px;
 `;
@@ -19,12 +20,6 @@ const Points = styled.p`
 
 const randomFirstName = faker.person.firstName(); // Generate a random first name
 
-const categories = [
-    { name: 'I - We Category', types: ['I', 'We'] },
-    { name: 'Reflective - Active Category', types: ['Reflective', 'Active'] },
-    { name: 'Emotional - Physical Category', types: ['Emotional', 'Physical'] },
-    { name: 'Guarded - Open Category', types: ['Guarded', 'Open'] }
-];
 const EvaluationScreen = ({ selections, showEvaluation }) => {
     console.log('selections', selections);
     const [splitText, setSplitText] = useState(null);
@@ -117,8 +112,8 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
         setEditableContent({
             description: geminiInsights[index]["description"],
             intro: geminiInsights[index]["intro"],
-            friends: geminiInsights[index]["AS FRIENDS:"],
-            partners: geminiInsights[index]["AS PARTNERS:"]
+            friends: geminiInsights[index]["friendship"],
+            partners: geminiInsights[index]["partnership"]
         });
     };
     const handleSave = () => {
@@ -127,8 +122,8 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
             ...updatedGeminiInsights[editableIndex],
             "description": editableContent.description,
             "intro": editableContent.intro,
-            "AS FRIENDS:": editableContent.friends,
-            "AS PARTNERS:": editableContent.partners
+            "friendship": editableContent.friends,
+            "partnership": editableContent.partners
         };
         setGeminiInsights(updatedGeminiInsights);
 
@@ -218,16 +213,16 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
             const feedbackDoc = feedbackType === "openai" ? "feedback_openai" : "feedback_gemini";
             const selection = selections[index]; // Get the selection at the current index
             const collectionName = `${selection.selfType.toLowerCase()}-${selection.matchType.toLowerCase()}`; // Collection name based on selection types
-            const id = makeId(10); // Generate a random ID of length 10
+            const id = makeId(4); // Generate a random ID of length 10
 
             const objectToWrite = {
                 id: id, // Include the generated ID
                 feedback: feedbackText,
                 createdAt: new Date(),
                 selection: selections[index],
-                evaluationText: feedbackType === "openai" ? splitText[index] : geminiInsights[index]
+                insights: feedbackType === "openai" ? splitText[index] : geminiInsights[index]
             };
-
+            console.log('objectToWrite', objectToWrite);
             // Create a document reference with the generated ID
             const docRef = doc(firestore, collectionName, id);
 
@@ -295,8 +290,8 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
                                         }}>
                                             <p dangerouslySetInnerHTML={{ __html: humanSplitText[index]["description"] }} />
                                             <p dangerouslySetInnerHTML={{ __html: humanSplitText[index]["intro"] }} />
-                                            <p><b>AS FRIENDS:</b> <span dangerouslySetInnerHTML={{ __html: humanSplitText[index]["AS FRIENDS:"] }} /></p>
-                                            <p><b>AS PARTNERS:</b> <span dangerouslySetInnerHTML={{ __html: humanSplitText[index]["AS PARTNERS:"] }} /></p>
+                                            <p><b>AS FRIENDS:</b> <span dangerouslySetInnerHTML={{ __html: humanSplitText[index]["friendship"] }} /></p>
+                                            <p><b>AS PARTNERS:</b> <span dangerouslySetInnerHTML={{ __html: humanSplitText[index]["partnership"] }} /></p>
                                         </div>
                                     )}
                                 </Col>
@@ -359,8 +354,8 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
                                                 <>
                                                     <p dangerouslySetInnerHTML={{ __html: geminiInsights[index]["description"] }} />
                                                     <p dangerouslySetInnerHTML={{ __html: geminiInsights[index]["intro"] }} />
-                                                    <p><b>AS FRIENDS:</b> <span dangerouslySetInnerHTML={{ __html: geminiInsights[index]["AS FRIENDS:"] }} /></p>
-                                                    <p><b>AS PARTNERS:</b> <span dangerouslySetInnerHTML={{ __html: geminiInsights[index]["AS PARTNERS:"] }} /></p>
+                                                    <p><b>AS FRIENDS:</b> <span dangerouslySetInnerHTML={{ __html: geminiInsights[index]["friendship"] }} /></p>
+                                                    <p><b>AS PARTNERS:</b> <span dangerouslySetInnerHTML={{ __html: geminiInsights[index]["partnership"] }} /></p>
                                                     <div style={{ textAlign: 'center', marginTop: 3 }} >
                                                         <Button className='me-2' onClick={() => handleEdit(index)}>Edit</Button>
                                                         <Button style={{ backgroundColor: 'white' }} variant='outline-primary' onClick={() => { fetchEvaluationText('gemini', 0, selection.selfType, selection.matchType, index) }}><b>Generate Another</b></Button>
@@ -426,8 +421,8 @@ function splitEvaluationTextGemini(evaluationList) {
     const splitContent = {
         description: "AI Error. Please try again.",
         intro: "AI Error. Please try again.",
-        "AS FRIENDS:": "AI Error. Please try again.",
-        "AS PARTNERS:": "AI Error. Please try again."
+        "friendship": "AI Error. Please try again.",
+        "partnership": "AI Error. Please try again."
     };
 
     // Assign each paragraph to the appropriate part of splitContent
@@ -435,8 +430,8 @@ function splitEvaluationTextGemini(evaluationList) {
     if (evaluationList.length >= 4) {
         splitContent.description = evaluationList[0].trim()
         splitContent.intro = evaluationList[1].trim()
-        splitContent["AS FRIENDS:"] = evaluationList[2].trim()
-        splitContent["AS PARTNERS:"] = evaluationList[3].trim()
+        splitContent["friendship"] = evaluationList[2].trim()
+        splitContent["partnership"] = evaluationList[3].trim()
     }
 
     return splitContent;

@@ -126,5 +126,77 @@ export const evaluationTextMapping = {
             "[Compatibility Name] needs you to earn their trust over time through shared experiences. You're open with people from the get-go, and [Compatibility Name] might dig that about you, or they might find it awkward. Either way, you need to be okay with them taking it slow. No scoresheets. you'll see, a strong friendship between the two of you is totally possible if the respect for each other's pacing is mutual. Be patient and encouraging, but not demanding.",
             "Jumping into something romantic with [Compatibility Name] will give you the chance to think outside the box. You may even learn to love a little mystery. It can make things exciting. And yeah, it's normal to want your partner to be as open as you. You're as excited to explore their inner world as you are to share yours. If only they'd hurry it up a little bit, right? Well, of course you should advocate for your needs, you want to get to know the person you're with and you should not have to wait forever. But you may be surprised to see that giving them the space to open up at their own pace might actually be what earns you their trust and takes their guard down."
         ]
+    },
+    "exploring-exploring": {
+        "insights": [
+            "You're not prioritizing a relationship right now. You're not really looking for anything in particular. You're seeking to discover whatever life has to give, your priority being the work you're doing on yourself, or your job, or school, or family, as you figure out what you want. You're just going with the moment.",
+            "[User Name] is a [Number], and [Compatibility Name] is a [Number], so you're both exploring life, not prioritizing romantic relationships right now.",
+            "You and [Compatibility Name] are just out there discovering life, going with the flow, learning about the world and your place in it. Neither of you are looking for a serious relationship right now, so you may wanna use this time to build a strong friendship.",
+            "You won't be rushing to label anything. Not having expectations leaves room for endless possibilities, such as some good fun in a casual fling, or...maybe something else? Who knows what may arise when you're open to what life brings."
+        ]
+    },
+    "exploring-connecting": {
+        "insights": [
+            "You're not prioritizing a relationship right now. You're not really looking for anything in particular. You're seeking to discover whatever life has to give, your priority being the work you're doing on yourself, or your job, or school, or family, as you figure out what you want. You're just going with the moment.",
+            "[User Name] is a [Number], and [Compatibility Name] is a [Number], so they're prioritizing romantic relationships a little more than you right now.",
+            "Right you now you're just learning about the world and about yourself, open to what life brings you. That could include striking up a new and true friendship with [Compatibility Name]. Thing is, they're focusing a little more on dating (if they're single) or their partner. So be sure to make space for each other's priorities, and offer mutual support along the way.",
+            "You're not looking to be tied down with labels or anything like that, prefering casual fun on your path of self-discovery. But [Compatibility Name] seeks something more substantial than just-for-fun vibes. Clarity of intentions will prevent misunderstandings. And if there's a romantic spark, a bond could form somewhere between casual and committed, if you're willing to meet [Name] somewhere in the middle."
+        ]
+    },
+    "exploring-bonding": {
+        "insights": [
+            "You're not prioritizing a relationship right now. You're not really looking for anything in particular. You're seeking to discover whatever life has to give, your priority being the work you're doing on yourself, or your job, or school, or family, as you figure out what you want. You're just going with the moment.",
+            "[User Name] is a [Number], and [Compatibility Name] is a [Number], so they're prioritizing romantic relationships a lot more than you right now.",
+            "So, [Compatibility Name] is seeking the real-deal romantic relationship, while you're busy world-exploring and soul-searching. But friendship can be found between opposite walks of life, and make for some entertaining conversations. With so much to learn from each other, you both could end up becoming part of each other's support system.",
+            "Alright, this pairing is likely to be a total mismatch...unless you're ready to begin a whole new chapter in your life. See, [Compatibility Name] is out here searching for a lasting romantic partner. And you're kinda cruising, learning about life with no need to commit. So unless you're up for a major shift, let's be honest and steer clear of romance together. Cool? Cool."
+        ]
+    },
+    "connecting-exploring": {
+        "insights": [
+            "You're prioritizing making connections with people. You're seeking something with substance but not concerned with any promise of permanence. You want something more meaningful than wild fun, so while you'd like to leave things open, your one condition is that, whatever happens, it should matter.",
+            "[User Name] is a [Number], and [Compatibility Name] is a [Number], so they're not prioritizing romantic relationships as much as you are right now.",
+            "You may appreciate [Compatibility Name]'s free-spirited ways as they prioritize figuring out their life. And that's cool. But you're making space for something of substance, and preferably a little romantic. So, as friends, the two of you can build a bond through shared experiences and support each other's separate search.",
+            "Be real clear on what you want, cause [Compatibility Name] is in total exploratory mode, focused on other priorities, and your main condition is a soulful connection with some romance, even if the relationship is short-term. Have the talk, and if they're up for something meaningful, then the two of you can discover life (and yourselves) together."
+        ]
+    },
+    "connecting-connecting": {
+        "insights": [
+            "At this point, you're emphasizing the importance of connecting with others. You're in search of a relationship that holds meaning, but you're not preoccupied with its longevity. You're aiming for something more profound than just casual fun, so although you're willing to see where things go, your primary condition is that whatever transpires should be significant.",
+            "[User Name] is at a [Number] on the readiness scale, and [Compatibility Name] is [Number], indicating a mutual prioritization of deepening the relationship further. This equal footing in terms of relationship readiness suggests that both parties are equally invested in taking the next steps to connect on a more significant level.",
+            "In the realm of friendship, [Compatibility Name] becomes a mirror reflecting your own desires for connection. Together, you navigate the complexities of trust and vulnerability. The shared journey involves discovering mutual interests, offering support during times of need, and celebrating each other's successes. This phase is crucial for establishing a friendship that is both enriching and enduring.",
+            "When considering a partnership, [Compatibility Name] stands beside you as an equal partner in the quest for a deeper bond. The 'Connecting' stage here means engaging in conversations about future aspirations, values, and dreams. It's about building a relationship that not only withstands the test of time but also fosters personal growth and mutual understanding. The emphasis is on creating a partnership where both individuals feel seen, heard, and valued."
+        ]
+    },
+    "connecting-bonding": {
+        "insights": [
+            "Right now, your priority is forming meaningful connections with people. You're seeking something substantial, but you're not fixated on long-term commitment. You desire something deeper than mere excitement, so while you're keeping an open mind, your only stipulation is that whatever develops should be impactful.",
+            "[User Name] is at a [Number] on the readiness scale, and [Compatibility Name] is at a [Number], indicating that while you're looking to deepen connections, [Compatibility Name] is ready to fully commit and form a lasting bond. This difference in readiness levels suggests that [Compatibility Name] might be seeking a more profound level of commitment and emotional investment at this time.",
+            "In friendship, this difference in readiness might manifest in the way [Compatibility Name] is more eager to share personal details, seek emotional support, and invest in the friendship on a deeper level. It's important to navigate this stage with open communication and understanding, acknowledging each other's boundaries and readiness levels.",
+            "In a partnership, [Compatibility Name]'s bonding readiness signifies a desire for a committed and long-term relationship. This stage involves not just emotional investment, but also discussions about future plans, values, and mutual goals. For a balanced partnership, it's crucial to align your expectations and ensure that both parties are comfortable with the pace and depth of the relationship."
+        ]
+    },
+    "bonding-exploring": {
+        "insights": [
+            "You're prioritizing bonding with a partner. You're ready to put forth the time and effort to build a partnership that works. Nurturing the bond with your partner to keep it strong is your priority. You realize that while falling in love is easy, staying in love requires dedication and intention, and you think it's more than worth it.",
+            "[User Name] is at a [Number] on the readiness scale, indicating a strong focus on bonding and commitment. On the other hand, [Compatibility Name] is at a [Number], showing an inclination towards exploring and keeping options open. This difference suggests that while you are ready for a deep, long-term commitment, [Compatibility Name] might be more interested in casual interactions and exploring multiple connections.",
+            "In the realm of friendship, this discrepancy in readiness levels might lead to different expectations. You might be seeking a loyal and dependable friend who is willing to invest time and energy into the relationship, while [Compatibility Name] could be looking for a more light-hearted and flexible companionship, where there is less pressure to commit and more freedom to explore.",
+            "When it comes to a romantic partnership, your readiness for bonding means you are looking for a partner who is not only a lover but also a confidant and a teammate. You are prepared to work through challenges together and build a future based on mutual respect and shared goals. In contrast, [Compatibility Name]'s exploratory approach might manifest in a desire for less commitment and more independence, which could lead to misaligned expectations if not addressed openly."
+        ]
+    },
+    "bonding-connecting": {
+        "insights": [
+            "You're prioritizing bonding with a partner. You're ready to put forth the time and effort to build a partnership that works. Nurturing the bond with your partner to keep it strong is your priority. You realize that while falling in love is easy, staying in love requires dedication and intention, and you think it's more than worth it.",
+            "[User Name] is at a [Number] on the readiness scale, indicating a deep commitment to bonding and forming a lasting relationship. In contrast, [Compatibility Name] is at a [Number], showing a readiness to connect and deepen the relationship, but perhaps not yet at the stage of full commitment. This difference suggests that while you are both interested in a meaningful relationship, [Compatibility Name] may still be exploring the depths of the connection.",
+            "In a friendship context, this means you are looking for a friend who is willing to invest in a close and enduring relationship, while [Compatibility Name] might be seeking to strengthen the bond but may not yet be ready for the level of commitment you desire. It's important to communicate openly about expectations and ensure that both parties are comfortable with the pace of the relationship's development.",
+            "For a romantic partnership, your readiness for bonding signifies a desire for a committed and long-term relationship, where both partners are fully invested in each other's well-being and in building a future together. [Compatibility Name]'s connecting readiness indicates a willingness to deepen the emotional connection, but there may still be a need for further exploration before reaching the same level of commitment. Balancing these different stages of readiness is crucial for the relationship's success."
+        ]
+    },
+    "bonding-bonding": {
+        "insights": [
+            "You're prioritizing bonding with a partner. You're ready to put forth the time and effort to build a partnership that works. Nurturing the bond with your partner to keep it strong is your priority. You realize that while falling in love is easy, staying in love requires dedication and intention, and you think it's more than worth it.",
+            "[User Name] and [Compatibility Name] are both at a [Number] on the readiness scale, indicating a shared commitment to bonding and building a lasting relationship. This mutual dedication suggests that both of you are on the same page when it comes to investing in the relationship and working towards a future together.",
+            "In terms of friendship, this shared readiness level means that both of you are seeking a deep and enduring connection. You value loyalty, trust, and mutual support, and are both willing to put in the effort to maintain a strong and meaningful friendship that stands the test of time.",
+            "For a romantic partnership, this alignment in bonding readiness signifies a strong foundation for a committed and long-term relationship. Both of you are focused on nurturing the bond, facing challenges together, and creating a shared life based on mutual respect, love, and shared goals. This shared commitment is key to a fulfilling and lasting partnership."
+        ]
     }
 }

@@ -6,6 +6,7 @@ import EvaluationScreen from './EvaluationScreen';
 // Dropdown needs access to the DOM node in order to position the Menu
 import { Button } from 'react-bootstrap';
 import { CustomButton } from './CustomButton'; // Ensure this is the correct import for your Button
+import { Link } from 'react-router-dom';
 
 const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
     <Button
@@ -59,12 +60,14 @@ const QuizWindow = styled.div`
     height: auto;
     padding: 2em;
 `;
-const categories = [
-    { name: 'I - We Category', types: ['I', 'We'] },
-    { name: 'Reflective - Active Category', types: ['Reflective', 'Active'] },
-    { name: 'Emotional - Physical Category', types: ['Emotional', 'Physical'] },
-    { name: 'Guarded - Open Category', types: ['Guarded', 'Open'] }
+export const categories = [
+    { name: 'I - We Category', types: ['I', 'We'], keys: ['i-we', 'we-i', 'i-i', 'we-we'] },
+    { name: 'Reflective - Active Category', types: ['Reflective', 'Active'], keys: ['reflective-active', 'active-reflective', 'reflective-reflective', 'active-active'] },
+    { name: 'Emotional - Physical Category', types: ['Emotional', 'Physical'], keys: ['emotional-physical', 'physical-emotional', 'emotional-emotional', 'physical-physical'] },
+    { name: 'Guarded - Open Category', types: ['Guarded', 'Open'], keys: ['guarded-open', 'open-guarded', 'guarded-guarded', 'open-open'] },
+    { name: 'Relationship Readiness', types: ['Exploring', 'Connecting', 'Bonding'], keys: ['exploring-connecting', 'exploring-bonding', 'connecting-bonding', 'connecting-exploring', 'bonding-exploring', 'bonding-connecting', 'exploring-exploring', 'connecting-connecting', 'bonding-bonding'] }
 ];
+
 const SelectScreen = () => {
     let initialSelections = categories.map(() => ({ selfType: null, matchType: null }));
     initialSelections = categories.map((category) => ({
@@ -163,6 +166,10 @@ const SelectScreen = () => {
                     </Col>
                 </Row>
             ))}
+            <Link to="/examples" target="_blank" style={{ color: 'var(--color-dark-orange)' }}>
+                View Stored Examples
+            </Link>
+
             <hr />
             <CustomButton onClick={handleFinalizeSelections}>Finalize Selections</CustomButton>
             {showEvaluation && (

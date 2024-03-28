@@ -6,7 +6,7 @@
   --color-coral: #fb8057;
   --color-warm-orange: #fb8d61;
   --color-brown: #9e512a;
-  --color-deep-orange: #a93218;
+  --color-deep-orange: #af3a1f;
   --color-dark-orange: #d3411c;
   --color-pale-gold: #f2c688;
   --color-light-blue: #a4c2ee;
@@ -109,5 +109,5 @@ button:disabled {
 }
 
 .custom-carousel .carousel-indicators .active {
-  background-color: #fbfbfb;
+  background-color: var(--color-bright-orange);
 }
