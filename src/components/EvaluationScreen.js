@@ -312,6 +312,7 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
                                                             rows={8}
                                                             value={editableContent.description}
                                                             onChange={(e) => setEditableContent({ ...editableContent, description: e.target.value })}
+                                                            style={{ fontSize: 20 }}
                                                         />
                                                     </Form.Group>
 
@@ -322,6 +323,8 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
                                                             rows={8}
                                                             value={editableContent.intro}
                                                             onChange={(e) => setEditableContent({ ...editableContent, intro: e.target.value })}
+                                                            style={{ fontSize: 20 }}
+
                                                         />
                                                     </Form.Group>
 
@@ -332,6 +335,7 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
                                                             rows={8}
                                                             value={editableContent.friends}
                                                             onChange={(e) => setEditableContent({ ...editableContent, friends: e.target.value })}
+                                                            style={{ fontSize: 20 }}
                                                         />
                                                     </Form.Group>
 
@@ -342,6 +346,7 @@ const EvaluationScreen = ({ selections, showEvaluation }) => {
                                                             rows={8}
                                                             value={editableContent.partners}
                                                             onChange={(e) => setEditableContent({ ...editableContent, partners: e.target.value })}
+                                                            style={{ fontSize: 20 }}
                                                         />
                                                     </Form.Group>
                                                     <div style={{ textAlign: 'center', marginTop: 3 }}>
