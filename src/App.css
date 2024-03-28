@@ -83,3 +83,31 @@ button:disabled {
   cursor: not-allowed;
   pointer-events: all !important;
 }
+
+.custom-carousel .carousel-control-prev,
+.custom-carousel .carousel-control-next {
+  width: 5%;
+  /* Adjust the width as needed */
+}
+
+.custom-carousel .carousel-inner {
+  padding-left: 5%;
+  /* Adjust the padding as needed */
+  padding-right: 5%;
+  /* Adjust the padding as needed */
+}
+
+.custom-carousel .carousel-indicators button {
+  width: 25px !important;
+  /* Adjust the width as needed */
+  height: 25px;
+  /* Adjust the height as needed */
+  border-radius: 50%;
+  background-color: #999;
+  margin: 0 4px;
+  /* Adjust the spacing between indicators */
+}
+
+.custom-carousel .carousel-indicators .active {
+  background-color: #fbfbfb;
+}
